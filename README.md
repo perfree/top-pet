@@ -1,81 +1,85 @@
-# Top Pet · 卡皮顶栏小伙伴
+# Top Pet · Your Capybara Panel Companion
 
-一只住在 Linux 顶栏里的软萌卡皮巴拉：慢悠悠地散步，偶尔小跑，遇到图标会钻下去，再从另一侧冒出来。你可以摸摸它、喂胡萝卜，或者陪它玩捉迷藏。
+**English** | [简体中文](README.zh-CN.md)
+
+A cute capybara living in your Linux top panel. It takes leisurely walks, occasionally breaks into a run, and ducks below icons to pop up on the other side. Pet it, feed it carrots, or play hide-and-seek together.
 
 <p align="center">
-  <img src="panel-pet@local/assets/capybara-atlas.png" width="800" alt="卡皮巴拉的站立、散步、奔跑、开心、吃胡萝卜、探头和休息动作">
+  <img src="panel-pet@local/assets/capybara-atlas.png" width="800" alt="Capybara standing, walking, running, smiling, eating a carrot, peeking and resting">
 </p>
 
-**适用环境：GNOME Shell 46，主要在 Zorin OS 18 上开发和验证。** KDE、Xfce 和其他 GNOME 版本暂未适配。
+**Requires GNOME Shell 46. Primarily developed and tested on Zorin OS 18.** KDE, Xfce and other GNOME versions are not currently supported.
 
-[下载最新版](https://github.com/perfree/top-pet/releases/latest) · [更新记录](CHANGELOG.md) · [测试说明](docs/TESTING.md) · [反馈问题](https://github.com/perfree/top-pet/issues)
+[Download the latest release](https://github.com/perfree/top-pet/releases/latest) · [Changelog (Chinese)](CHANGELOG.md) · [Testing notes (Chinese)](docs/TESTING.md) · [Report an issue](https://github.com/perfree/top-pet/issues)
 
-## 它会做什么
+## Features
 
-- **散步与奔跑**：在顶栏空位之间移动，到边缘自动转向，也会停下来发呆。
-- **下沉闪现**：遇到图标，向下完全隐藏，跨过控件后从另一边冒出来；左右两个方向均支持。
-- **挤出空位**：前方图标密集时，附近控件平滑让出位置；卡皮钻进去停留，离开后图标自动复位。没有足够余量时不会把图标挤出屏幕。
-- **摸摸与喂食**：摸摸会开心地冒爱心，喂胡萝卜会播放进食动作，恢复饱食和心情。
-- **捉迷藏**：藏起来约 1.8 秒，在随机空位探头，点击它就算找到。
-- **自适应大小**：按真实顶栏高度调整身体尺寸，去掉固定 32px 上限和多余透明留白，适应高分屏的界面缩放。
-- **可暂停、可关闭让位**：都在宠物菜单里。概览或主屏全屏应用期间隐藏。
+- **Walk, run and rest:** Roam through available panel space, turn around at the edges, or stop for a break.
+- **Duck and teleport:** Sink completely below the panel, cross an icon, then emerge on the other side. Works in both directions.
+- **Make a little room:** Nearby controls gently move aside when icons are crowded. The capybara visits the temporary gap, then the controls return to their original positions. Icons stay within the screen boundaries.
+- **Pet and feed:** Petting brings out happy hearts. Feeding a carrot plays an eating animation and restores fullness and mood.
+- **Hide-and-seek:** Hide for about 1.8 seconds, then peek out at a random location. Click the capybara to find it.
+- **Adaptive sizing:** Match the actual panel height, with no fixed 32px cap and less transparent padding around the artwork, for better visibility on scaled displays.
+- **Pause and optional icon movement:** Both are available in the pet menu. The pet hides during the overview or a fullscreen application on the primary monitor.
 
-## 安装
+## Installation
 
-先确认版本：
+Check your GNOME version first:
 
 ```bash
 gnome-shell --version
 ```
 
-1. 从 [Releases](https://github.com/perfree/top-pet/releases/latest) 下载 **`panel-pet@local.shell-extension.zip`**。不要把 GitHub 自动提供的源码 ZIP 当作扩展安装包。
-2. 在下载目录打开终端，执行：
+1. Download **`panel-pet@local.shell-extension.zip`** from [Releases](https://github.com/perfree/top-pet/releases/latest). The automatically generated source ZIP is not the extension installer.
+2. Open a terminal in your download directory and run:
 
    ```bash
    gnome-extensions install --force panel-pet@local.shell-extension.zip
    ```
 
-3. 保存工作，**注销并重新登录**。首次安装和更新代码后都建议执行此步骤，GNOME 会话会缓存扩展代码。
-4. 启用：
+3. Save your work, then **log out and log back in**. Do this after both the first installation and code updates, because GNOME caches extension code within a session.
+4. Enable the extension:
 
    ```bash
    gnome-extensions enable panel-pet@local
    ```
 
-也可以在 GNOME“扩展”应用中打开 **Panel Pet · 顶栏小伙伴**。安装到当前用户，不需要 `sudo`。
+You can also enable **Panel Pet · 顶栏小伙伴** in the GNOME Extensions application. Installation is per-user and does not require `sudo`.
 
-### 怎么玩
+### Controls
 
-| 操作 | 效果 |
+The extension's current interface is primarily in Chinese. The menu labels below help you find each action.
+
+| Action or menu label | What it does |
 | --- | --- |
-| 左键点击卡皮 | 摸摸，捉迷藏时找到它 |
-| 右键点击卡皮 | 打开互动菜单 |
-| 点击顶栏笑脸 | 打开互动菜单，卡皮藏起来时也能找到入口 |
-| 喂一根胡萝卜 | 进食、恢复饱食与心情 |
-| 一起追逐 | 小跑一会儿 |
-| 捉迷藏 | 隐藏后随机探头 |
-| 图标给卡皮让让路 | 开关图标让位动画 |
-| 休息一下 | 暂停或继续活动 |
+| Left-click the capybara | Pet it, or find it during hide-and-seek |
+| Right-click the capybara | Open the interaction menu |
+| Click the smiley in the panel | Open the menu, even while the pet is hiding |
+| 喂一根胡萝卜 — Feed a carrot | Eat and restore fullness and mood |
+| 一起追逐 — Play chase | Run around for a while |
+| 捉迷藏 — Hide-and-seek | Hide, then peek out at a random location |
+| 图标给卡皮让让路 — Make room for the pet | Toggle the icon movement animation |
+| 休息一下 — Take a break | Pause or resume activity |
 
-### 禁用与卸载
+### Disable or uninstall
 
 ```bash
-# 暂时关闭
+# Temporarily disable
 gnome-extensions disable panel-pet@local
 
-# 完全卸载
+# Uninstall
 gnome-extensions uninstall panel-pet@local
 ```
 
-## 不安装也能试玩
+## Try it without installing
 
-在 Release 中下载 **`top-pet-preview.html`**，用浏览器直接打开即可，无需服务器或联网。
+Download **`top-pet-preview.html`** from a release and open it directly in a browser. No server or internet connection is required.
 
-试玩页与扩展共用行为代码和角色素材；页面顶栏是模拟环境。真实图标让位依赖 GNOME 挂载层，以桌面扩展为准。
+The preview shares the extension's behavior code and artwork, but its panel is simulated. Moving real icons requires the GNOME integration and is available in the desktop extension.
 
-## 从源码构建
+## Build from source
 
-需要 **Node.js 18+、Python 3**，不需要安装 npm 依赖。
+Requires **Node.js 18+ and Python 3**. No npm dependencies need to be installed.
 
 ```bash
 git clone https://github.com/perfree/top-pet.git
@@ -84,79 +88,79 @@ npm test
 npm run build
 ```
 
-构建结果：
+Build output:
 
 ```text
 dist/
-├── panel-pet@local.shell-extension.zip  # GNOME 扩展安装包
-├── top-pet-preview.html                # 可独立打开的试玩页
-└── SHA256SUMS                          # SHA-256 校验值
+├── panel-pet@local.shell-extension.zip  # GNOME extension installer
+├── top-pet-preview.html                # Standalone browser preview
+└── SHA256SUMS                          # SHA-256 checksums
 ```
 
-根目录同时生成 `preview.html`，方便本地预览。校验下载文件时，将三个文件放在同一目录，执行 `sha256sum -c SHA256SUMS`。
+The build also generates `preview.html` in the project root for local preview. To verify downloads, place all three release files in the same directory and run `sha256sum -c SHA256SUMS`.
 
-## 测试与兼容性
+## Testing and compatibility
 
-当前版本通过 **15 项单元测试、29 项真实 GNOME 集成断言**。集成测试在独立的 GNOME Shell 46 / Wayland 会话中运行，使用虚拟鼠标实际点击，覆盖喂食、双向闪现、图标让位与自动复位、捉迷藏、概览隐藏和启停清理。
+The current version passed **15 unit tests and 29 real GNOME integration assertions**. Integration tests run in an isolated GNOME Shell 46 / Wayland session and use virtual mouse input to exercise feeding, teleporting in both directions, icon movement and restoration, hide-and-seek, overview visibility, and enable/disable cleanup.
 
-高分屏测试使用 2560×1600 虚拟显示和 2 倍内部界面缩放；开发桌面为 Zorin OS 18.1、2560×1600、X11 125% 分数缩放。独立测试并不等于覆盖所有 X11、显示缩放或第三方扩展组合。详细步骤和结果见 [测试说明](docs/TESTING.md)。
+Display tests use a 2560×1600 virtual display with an internal UI scale of 2. The development desktop runs Zorin OS 18.1 at 2560×1600 with X11 fractional scaling set to 125%. The isolated tests do not cover every X11, display scaling or third-party extension combination. See the [testing notes (Chinese)](docs/TESTING.md) for procedures and results.
 
 <details>
-<summary>查看真实 GNOME 测试中的图标让位截图</summary>
+<summary>View icon movement in a real GNOME test session</summary>
 
-![真实 GNOME 顶栏中的卡皮和临时空位](docs/images/runtime.png)
+![The capybara occupying a temporary gap in a real GNOME panel](docs/images/runtime.png)
 
 </details>
 
-### 当前限制
+### Current limitations
 
-- 只在主屏原生 GNOME 顶栏 `Main.panel` 上运行。用独立任务栏替换原生顶栏的布局需要单独适配。
-- 图标按整个控件点击区域避让，有时会跨过整个控件组。
-- 饱食和心情暂存在内存，重新启用扩展会重置。
-- 使用第三方顶栏主题或扩展时，建议先关闭“图标给卡皮让让路”判断是否存在布局冲突。
-- 当前公开版本为早期版本，界面以中文为主。
+- Runs only on the primary monitor's native GNOME panel, `Main.panel`. Layouts that replace it with a separate taskbar need additional integration.
+- Avoidance uses each control's entire clickable area, so the pet may cross a whole group of icons at once.
+- Fullness and mood are stored in memory and reset when the extension is re-enabled.
+- With third-party panel themes or extensions, try disabling icon movement to help identify layout conflicts.
+- This is an early release. The application interface is primarily in Chinese; the README language switch changes documentation only.
 
-## 常见问题
+## Troubleshooting
 
-**安装后找不到扩展或看不到卡皮？**
+**The extension or capybara does not appear after installation**
 
-先注销重新登录，确认 GNOME 版本为 46，再检查：
+Log out and back in, confirm that you are running GNOME 46, then check:
 
 ```bash
 gnome-extensions info panel-pet@local
 ```
 
-扩展应为 `ACTIVE`。如果顶栏完全没有可容纳宠物的空位，卡皮会暂时隐藏，笑脸菜单仍可用。
+The extension should be `ACTIVE`. If the panel has no room for the pet, it temporarily hides while the smiley menu remains available.
 
-**更新后还是旧效果？**
+**An update still looks like the old version**
 
-重新登录以清除 GNOME 的扩展模块缓存；单纯开关扩展不一定会重新读取代码。
+Log in again to clear GNOME's extension module cache. Simply toggling the extension may not reload its code.
 
-**如何提供诊断信息？**
+**Reporting a problem**
 
-在 Issue 中说明发行版、GNOME 版本、分辨率、缩放比例和相关顶栏扩展，并附上相关错误：
+Include your distribution, GNOME version, resolution, scaling setting and relevant panel extensions in an issue, along with related errors:
 
 ```bash
 journalctl --user -b -o cat | rg 'panel-pet|PanelPet|JS ERROR'
 ```
 
-## 项目结构
+## Project structure
 
 ```text
 panel-pet@local/
-├── extension.js          # GNOME 挂载、菜单、输入和纹理
-├── engine.js             # 行为状态机与可用空间计算
-├── push.js               # 图标让位规划与边界检查
-├── sprite.js             # 动作选择与浏览器渲染
-├── metadata.json         # GNOME 扩展信息
-└── assets/               # 透明角色动作图集
-tests/                    # 单元测试
-tools/                    # 构建与独立 GNOME 集成测试
-preview.template.html     # 离线试玩页模板
+├── extension.js          # GNOME integration, menus, input and textures
+├── engine.js             # Behavior state machine and free-space calculation
+├── push.js               # Icon displacement planning and boundary checks
+├── sprite.js             # Animation selection and browser rendering
+├── metadata.json         # GNOME extension metadata
+└── assets/               # Transparent character sprite atlas
+tests/                    # Unit tests
+tools/                    # Build and isolated GNOME integration tests
+preview.template.html     # Offline preview template
 ```
 
-卡皮素材由 AI 生成，使用软萌 3D 风格，未使用小米原始素材。本项目与小米无关联。
+The capybara artwork is AI-generated in a soft 3D style. It does not use Xiaomi's original assets, and this project is not affiliated with Xiaomi.
 
-## 发布新版本
+## Publishing a release
 
-维护者更新 `CHANGELOG.md`，添加 `docs/releases/vX.Y.Z.md`，提交后推送 `vX.Y.Z` 标签。GitHub Actions 会执行单元测试和构建，再创建包含安装包、试玩页与校验文件的 Release。GNOME `metadata.json` 的整数 `version` 与 GitHub 的语义版本分别维护；首次公开版本 `v0.1.0` 对应扩展版本 `3`。
+Maintainers update `CHANGELOG.md`, add `docs/releases/vX.Y.Z.md`, commit, and push a `vX.Y.Z` tag. GitHub Actions runs unit tests and builds the artifacts before publishing a release with the installer, offline preview and checksums. The integer `version` in GNOME's `metadata.json` is maintained separately from the GitHub semantic version: the first public release, `v0.1.0`, corresponds to extension version `3`.
