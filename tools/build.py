@@ -21,7 +21,7 @@ preview_path.write_text(preview)
 zip_path = dist / 'panel-pet@local.shell-extension.zip'
 with ZipFile(zip_path, 'w', ZIP_DEFLATED) as archive:
     for path in sorted(extension.rglob('*')):
-        if path.is_file() and path.suffix in {'.js', '.json', '.png'}:
+        if path.is_file() and path.suffix in {'.js', '.json', '.png', '.py'}:
             entry = ZipInfo(path.relative_to(extension).as_posix(), date_time=(1980, 1, 1, 0, 0, 0))
             entry.compress_type = ZIP_DEFLATED
             entry.external_attr = 0o100644 << 16

@@ -123,6 +123,45 @@ export default class IntegrationTest extends Extension {
         this.assert(pet.spans.some(([a,b])=>pet.x>=a&&pet.x<=b), 'pet safely exits the temporary pocket');
         this.assert(moved.every(e=>Math.abs(e.actor.translation_x-e.original)<0.1),'all icon positions restored');
         pet.paused=false;
+        // Exercise both actual edge groups, including the single left control.
+        for(const direction of [-1,1]) {
+            ext._pushCooldown=0;pet.random=()=>0.7;
+            pet.act('walk',30,'edge test');pet.direction=direction;
+            pet.x=direction<0?pet.spans[0][0]+0.1:pet.spans.at(-1)[1]-0.1;
+            await this.until(()=>ext._push?.phase==='resting',`edge pocket ${direction}`,5000);
+            this.assert(ext._shifted.length>0 && pet.spans.some(([a,b])=>pet.x>=a&&pet.x<=b),`pet enters actual edge group ${direction}`);
+            pet.paused=true;await this.shot(direction<0?'08-left-edge':'09-right-edge');
+            const shifted=ext._shifted.map(e=>({actor:e.actor,original:e.original}));
+            pet.paused=false;pet.nextChoice=pet.time;
+            await this.until(()=>!ext._push,'edge restoration',5000);await this.delay(700);
+            this.assert(shifted.every(e=>Math.abs(e.actor.translation_x-e.original)<0.1),`edge group restores ${direction}`);
+        }
+        // A real MPRIS service appears after the extension has already started.
+        const player = {PlaybackStatus:'Playing'};
+        this.playerExport=Gio.DBusExportedObject.wrapJSObject(
+            '<node><interface name="org.mpris.MediaPlayer2.Player"><property name="PlaybackStatus" type="s" access="read"/></interface></node>',player);
+        this.playerExport.export(Gio.DBus.session,'/org/mpris/MediaPlayer2');
+        this.playerOwner=Gio.bus_own_name_on_connection(Gio.DBus.session,'org.mpris.MediaPlayer2.TopPetTest',Gio.BusNameOwnerFlags.NONE,null,null);
+        await this.until(()=>ext._activity.playing,'late music player detected',6500);
+        pet.act('walk',30,'music');ext._nextSpeech=0;
+        await this.delay(200);
+        this.assert(ext._headphones.visible && Math.abs(ext._art.rotation_angle_z)>0,'MPRIS playing enables headphones and dance');
+        this.assert(ext._bubble.visible && ['这首歌好好听，陪你摇一摇 ♪','耳机戴好，烦恼跑掉～','你的专属伴舞上线啦！'].includes(ext._bubble.text),'music triggers a contextual speech bubble');
+        await this.shot('07-music-and-speech');
+        player.PlaybackStatus='Paused';await ext._activity.refresh();await this.delay(100);
+        this.assert(!ext._activity.playing && !ext._headphones.visible && ext._art.rotation_angle_z===0,'pausing music removes headphones and dance');
+        this.keyboard=Clutter.get_default_backend().get_default_seat().create_virtual_device(Clutter.InputDeviceType.KEYBOARD_DEVICE);
+        this.keyboard.notify_key(GLib.get_monotonic_time(),30,Clutter.KeyState.PRESSED);
+        this.keyboard.notify_key(GLib.get_monotonic_time(),30,Clutter.KeyState.RELEASED);
+        await this.delay(100);ext._nextSpeech=0;await this.delay(100);
+        this.assert(ext._typingUntil>GLib.get_monotonic_time()/1e6,'real Shell keyboard activity is detected');
+        this.assert(ext._bubble.visible && ['主人','哒哒哒','慢慢写'].some(text=>ext._bubble.text.includes(text)),'typing receives encouragement');
+        const next=ext._nextSpeech;await this.delay(100);
+        this.assert(ext._nextSpeech===next && next-pet.time>35,'speech has a cooldown');
+        ext._chatEnabled=false;await this.delay(100);this.assert(!ext._bubble.visible,'speech can be disabled');
+        this.playerExport.unexport();this.playerExport=null;
+        Gio.bus_unown_name(this.playerOwner);this.playerOwner=0;
+        await ext._activity.refresh();this.assert(!ext._activity.playing,'player disappearance is handled');
         const children=Main.layoutManager.uiGroup.get_children().length;
         const previous=ext._layer;
         await Main.extensionManager.disableExtension('panel-pet@local'); await this.delay(350);
@@ -136,6 +175,8 @@ export default class IntegrationTest extends Extension {
     }
     finish(error) {
         this.obstacle?.destroy(); this.obstacle=null;
+        this.playerExport?.unexport();this.playerExport=null;
+        if(this.playerOwner)Gio.bus_unown_name(this.playerOwner);this.playerOwner=0;
         const report={passed:!error, error:error ? `${error.message}\n${error.stack}` : null, tests:this.results};
         GLib.file_set_contents(`${GLib.getenv('PANEL_PET_TEST_OUTPUT')}/report.json`,JSON.stringify(report,null,2));
         if (error) console.error(`PANEL_PET_TEST_FAILED: ${error.stack}`);

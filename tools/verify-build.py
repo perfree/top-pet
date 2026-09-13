@@ -11,7 +11,7 @@ dist = root / 'dist'
 for line in (dist / 'SHA256SUMS').read_text().splitlines():
     expected, name = line.split('  ', 1)
     assert hashlib.sha256((dist / name).read_bytes()).hexdigest() == expected, name
-expected_files = {'metadata.json', 'extension.js', 'engine.js', 'push.js', 'sprite.js', 'assets/capybara-atlas.png'}
+expected_files = {'metadata.json', 'extension.js', 'engine.js', 'push.js', 'sprite.js', 'activity.js', 'typing-activity.py', 'assets/capybara-atlas.png'}
 with ZipFile(dist / 'panel-pet@local.shell-extension.zip') as z:
     assert z.testzip() is None
     assert set(z.namelist()) == expected_files

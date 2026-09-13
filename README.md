@@ -22,6 +22,13 @@ A cute capybara living in your Linux top panel. It takes leisurely walks, occasi
 - **Adaptive sizing:** Match the actual panel height, with no fixed 32px cap and less transparent padding around the artwork, for better visibility on scaled displays.
 - **Pause and optional icon movement:** Both are available in the pet menu. The pet hides during the overview or a fullscreen application on the primary monitor.
 
+## Music and encouragement
+
+- With an MPRIS-compatible player, the capybara puts on purple headphones, sways and bounces while playback is active. Pausing restores its usual animation. Playback status is checked about every 2.5 seconds; track titles and media contents are not read. Audio-only apps without MPRIS are not detected.
+- Contextual encouragement uses music, recent keyboard activity or general companionship. Bubbles last 5 seconds with a randomized 40–80 second interval and do not intercept clicks. Disable them with **卡皮悄悄话** in the menu.
+- On X11, an optional Python 3 / libX11 helper detects whether a key is down, without recording key values, text or window contents, and without network access. It cannot distinguish typing from shortcuts or gaming. On Wayland, keyboard awareness is limited to GNOME Shell itself, not other applications.
+- Hide-and-seek prefers locations away from the previous position. Dense icon movement no longer requires extra spacing between controls that originally touched.
+
 ## Installation
 
 Check your GNOME version first:
@@ -75,7 +82,7 @@ gnome-extensions uninstall panel-pet@local
 
 Download **`top-pet-preview.html`** from a release and open it directly in a browser. No server or internet connection is required.
 
-The preview shares the extension's behavior code and artwork, but its panel is simulated. Moving real icons requires the GNOME integration and is available in the desktop extension.
+The preview shares the extension's behavior code and artwork, but its panel is simulated. Moving real icons, music awareness and contextual bubbles require the desktop extension.
 
 ## Build from source
 
@@ -101,7 +108,7 @@ The build also generates `preview.html` in the project root for local preview. T
 
 ## Testing and compatibility
 
-The current version passed **15 unit tests and 29 real GNOME integration assertions**. Integration tests run in an isolated GNOME Shell 46 / Wayland session and use virtual mouse input to exercise feeding, teleporting in both directions, icon movement and restoration, hide-and-seek, overview visibility, and enable/disable cleanup.
+The current version passed **20 unit tests and 41 real GNOME integration assertions**. Integration tests run in an isolated GNOME Shell 46 / Wayland session and use virtual mouse input to exercise feeding, teleporting in both directions, icon movement and restoration, hide-and-seek, overview visibility, and enable/disable cleanup.
 
 Display tests use a 2560×1600 virtual display with an internal UI scale of 2. The development desktop runs Zorin OS 18.1 at 2560×1600 with X11 fractional scaling set to 125%. The isolated tests do not cover every X11, display scaling or third-party extension combination. See the [testing notes (Chinese)](docs/TESTING.md) for procedures and results.
 

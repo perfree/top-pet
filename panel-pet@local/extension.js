@@ -3,6 +3,7 @@ import Cogl from 'gi://Cogl';
 import GdkPixbuf from 'gi://GdkPixbuf';
 import GLib from 'gi://GLib';
 import St from 'gi://St';
+import Meta from 'gi://Meta';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import * as PanelMenu from 'resource:///org/gnome/shell/ui/panelMenu.js';
 import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';
@@ -10,10 +11,20 @@ import {Extension} from 'resource:///org/gnome/shell/extensions/extension.js';
 import {PetEngine} from './engine.js';
 import {getPose} from './sprite.js';
 import {planPocket} from './push.js';
+import {ActivityMonitor} from './activity.js';
 
 export default class PanelPet extends Extension {
     enable() {
         this._pet = new PetEngine();
+        this._typingUntil = 0;
+        this._nextSpeech = 12;
+        this._speechUntil = 0;
+        this._chatEnabled = true;
+        this._activity = new ActivityMonitor(this.path, () => this._noteTyping(), !Meta.is_wayland_compositor());
+        this._keySignal = global.stage.connect('captured-event', (_stage,event) => {
+            if (event.type() === Clutter.EventType.KEY_PRESS) this._noteTyping();
+            return Clutter.EVENT_PROPAGATE;
+        });
         this._shifted = [];
         this._push = null;
         this._pushCooldown = 0;
@@ -23,7 +34,7 @@ export default class PanelPet extends Extension {
         this._indicator.menu.addMenuItem(this._status);
         const action = (label, fn) => {
             const item = new PopupMenu.PopupMenuItem(label);
-            item.connect('activate', fn);
+            item.connect('activate', () => { this._restoreIcons(true); this._syncPanel(); fn(); });
             this._indicator.menu.addMenuItem(item);
         };
         action('摸摸它 ♡', () => this._pet.pet());
@@ -34,6 +45,9 @@ export default class PanelPet extends Extension {
         this._squeezeEnabled = true;
         squeeze.connect('toggled', (_item, value) => { this._squeezeEnabled = value; this._restoreIcons(); });
         this._indicator.menu.addMenuItem(squeeze);
+        const chat = new PopupMenu.PopupSwitchMenuItem('卡皮悄悄话', true);
+        chat.connect('toggled', (_item,value) => { this._chatEnabled=value; if(!value)this._bubble.hide(); });
+        this._indicator.menu.addMenuItem(chat);
         const pause = new PopupMenu.PopupSwitchMenuItem('休息一下', false);
         pause.connect('toggled', (_item, value) => { this._pet.paused = value; });
         this._indicator.menu.addMenuItem(pause);
@@ -64,9 +78,27 @@ export default class PanelPet extends Extension {
             content_gravity: Clutter.ContentGravity.RESIZE_FILL});
         this._art.set_pivot_point(0.5, 0.5);
         this._sprite.add_child(this._art);
+        // Vector headphones stay crisp at fractional scales and follow the capy's pose.
+        this._headphones = new St.DrawingArea({reactive:false});
+        this._headphones.connect('repaint', area => {
+            const cr=area.get_context(); const [w,h]=area.get_surface_size();
+            cr.scale(w,h);
+            cr.setSourceRGBA(0.22,0.17,0.31,1); cr.setLineWidth(0.055);
+            cr.arc(0.72,0.37,0.17,Math.PI,Math.PI*2); cr.stroke();
+            for(const x of [0.535,0.825]) {
+                cr.setSourceRGBA(0.43,0.32,0.61,1); cr.rectangle(x,0.30,0.075,0.21); cr.fill();
+                cr.setSourceRGBA(0.83,0.74,0.96,1); cr.rectangle(x+0.015,0.335,0.025,0.12); cr.fill();
+            }
+            cr.$dispose();
+        });
+        this._headphones.set_pivot_point(0.5,0.5);
+        this._sprite.add_child(this._headphones);
+        this._bubble = new St.Label({reactive:false, visible:false,
+            style:'background-color: rgba(48, 36, 28, 0.94); color: #fff5df; border: 1px solid #bca58b; border-radius: 14px; padding: 9px 14px; font-size: 14px;'});
+        Main.layoutManager.addChrome(this._bubble, {affectsInputRegion:false,trackFullscreen:true});
         this._frame = 0;
         this._sprite.connect('button-press-event', (_actor, event) => {
-            if (event.get_button() === 1) this._pet.pet();
+            if (event.get_button() === 1) { this._restoreIcons(true); this._pet.pet(); }
             else if (event.get_button() === 3) this._indicator.menu.toggle();
             return Clutter.EVENT_STOP;
         });
@@ -111,7 +143,15 @@ export default class PanelPet extends Extension {
                     }
                 }
             }
+            const dancing = this._activity.playing && ['walk','idle','run'].includes(this._pet.state) && moving && !this._push;
             const pose = getPose(this._pet);
+            if (dancing) { pose.frame = Math.sin(this._pet.time*9)>0 ? 1 : 2; pose.bob=-Math.abs(Math.sin(this._pet.time*9))*this._bodyHeight*0.10; }
+            this._art.rotation_angle_z = dancing ? Math.sin(this._pet.time*9)*8 : 0;
+            this._headphones.visible = this._activity.playing;
+            this._headphones.set_scale(this._pet.direction,1);
+            this._headphones.rotation_angle_z=this._art.rotation_angle_z;
+            this._headphones.translation_y=pose.bob;
+            this._updateSpeech(moving);
             if (pose.frame !== this._frame) { this._art.content = this._textures[pose.frame]; this._frame = pose.frame; }
             this._art.set_scale(this._pet.direction, 1);
             this._art.translation_y = pose.bob;
@@ -121,6 +161,34 @@ export default class PanelPet extends Extension {
         });
         this._syncPanel();
     }
+    _noteTyping() { this._typingUntil = GLib.get_monotonic_time()/1e6 + 8; }
+    _updateSpeech(moving) {
+        const now = this._pet.time;
+        if (!moving || !this._chatEnabled || this._pet.seek || ['sink','hidden','rise'].includes(this._pet.state)) {
+            this._bubble.hide(); return;
+        }
+        if (now >= this._nextSpeech) {
+            const typing = GLib.get_monotonic_time()/1e6 < this._typingUntil;
+            const lines = this._activity.playing
+                ? ['这首歌好好听，陪你摇一摇 ♪','耳机戴好，烦恼跑掉～','你的专属伴舞上线啦！']
+                : typing ? ['哒哒哒，辛苦啦！卡皮陪着你。','慢慢写，你已经很努力啦。','专注的主人，记得放松肩膀哦～']
+                : ['喝口水，再继续吧～','今天也有卡皮陪着你。','不用着急，一点一点来就好。'];
+            let text=lines[Math.floor(Math.random()*lines.length)];
+            if(text===this._lastSpeech)text=lines[(lines.indexOf(text)+1)%lines.length];
+            this._lastSpeech=text; this._bubble.text=text;
+            this._speechUntil=now+5;
+            this._nextSpeech=now+40+Math.random()*40;
+        }
+        this._bubble.visible=now<this._speechUntil;
+        if(this._bubble.visible) {
+            const [,width]=this._bubble.get_preferred_width(-1);
+            const [,height]=this._bubble.get_preferred_height(width);
+            this._bubble.set_size(width,height);
+            const monitor=Main.layoutManager.primaryMonitor;
+            this._bubble.set_position(Math.max(monitor.x+6,Math.min(monitor.x+monitor.width-width-6,
+                this._layer.x+this._pet.x+this._pet.size/2-width/2)), this._layer.y+this._layer.height+6);
+        }
+    }
     _syncPanel() {
         const panel = Main.panel;
         const [px, py] = panel.get_transformed_position();
@@ -128,7 +196,7 @@ export default class PanelPet extends Extension {
         const monitor = Main.layoutManager.primaryMonitor;
         const visible = panel.is_mapped() && width > 0 && height > 0 && !Main.overview.visible && !monitor?.inFullscreen;
         this._layer.visible = visible;
-        if (!visible) { this._restoreIcons(); return; }
+        if (!visible) { this._bubble.hide(); this._restoreIcons(); return; }
         this._layer.set_position(px, py); this._layer.set_size(width, height);
         // Panel coordinates already include Mutter's UI scale. Do not multiply
         // the user's fractional monitor scale a second time, or cap at 32 px.
@@ -136,6 +204,7 @@ export default class PanelPet extends Extension {
         const size = Math.round(this._bodyHeight * 1.18);
         this._sprite.set_size(size, this._bodyHeight);
         this._art.set_size(size, this._bodyHeight);
+        this._headphones.set_size(size,this._bodyHeight);
         const obstacles = [];
         const controls = [];
         // Top-level panel controls include labels and their click targets, not only icon pixels.
@@ -187,6 +256,10 @@ export default class PanelPet extends Extension {
     }
     disable() {
         this._restoreIcons(true);
+        if(this._keySignal)global.stage.disconnect(this._keySignal);
+        this._keySignal=0;
+        this._activity?.destroy();this._activity=null;
+        if(this._bubble){Main.layoutManager.removeChrome(this._bubble);this._bubble.destroy();this._bubble=null;}
         if (this._source) { GLib.Source.remove(this._source); this._source = null; }
         if (this._layer) { Main.layoutManager.removeChrome(this._layer); this._layer.destroy(); this._layer = null; }
         this._sprite = null;

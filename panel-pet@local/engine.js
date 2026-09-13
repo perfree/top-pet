@@ -50,8 +50,20 @@ export class PetEngine {
     hide() {
         if (!this.spans.length) return;
         this.seek = true; this.message = '数到三，来找我';
-        const span = this.spans[Math.floor(this.random() * this.spans.length)];
-        this.portal(span[0] + this.random() * (span[1] - span[0]), true);
+        // Choose by available length, excluding the area where we just disappeared.
+        const distance = this.size * 2;
+        const choices = this.spans.flatMap(([a,b]) => [
+            [a, Math.min(b, this.x-distance)], [Math.max(a,this.x+distance),b]
+        ]).filter(([a,b]) => b > a);
+        const pool = choices.length ? choices : this.spans;
+        const total = pool.reduce((sum,[a,b]) => sum + b-a, 0);
+        let roll = this.random() * total;
+        let target = pool.at(-1)[1];
+        for (const [a,b] of pool) {
+            if (roll <= b-a) { target = a+roll; break; }
+            roll -= b-a;
+        }
+        this.portal(target, true);
     }
     act(state, duration, message) {
         if (this.target !== undefined) this.x = this.target;

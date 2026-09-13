@@ -136,6 +136,54 @@
       "passed": true
     },
     {
+      "name": "pet enters actual edge group -1",
+      "passed": true
+    },
+    {
+      "name": "edge group restores -1",
+      "passed": true
+    },
+    {
+      "name": "pet enters actual edge group 1",
+      "passed": true
+    },
+    {
+      "name": "edge group restores 1",
+      "passed": true
+    },
+    {
+      "name": "MPRIS playing enables headphones and dance",
+      "passed": true
+    },
+    {
+      "name": "music triggers a contextual speech bubble",
+      "passed": true
+    },
+    {
+      "name": "pausing music removes headphones and dance",
+      "passed": true
+    },
+    {
+      "name": "real Shell keyboard activity is detected",
+      "passed": true
+    },
+    {
+      "name": "typing receives encouragement",
+      "passed": true
+    },
+    {
+      "name": "speech has a cooldown",
+      "passed": true
+    },
+    {
+      "name": "speech can be disabled",
+      "passed": true
+    },
+    {
+      "name": "player disappearance is handled",
+      "passed": true
+    },
+    {
       "name": "disable removes timer, overlay and menu",
       "passed": true
     },

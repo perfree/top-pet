@@ -17,3 +17,18 @@ test('many dense layouts remain bounded and ordered',()=>{
   if(p)p.ranges.forEach(([a,b],i)=>{assert.ok(a>=0&&b<=800);if(i)assert.ok(a>=p.ranges[i-1][1]);});
  }
 });
+
+for (const direction of [1,-1]) test(`zero-gap icons anchored to screen edge ${direction}`,()=>{
+ const ranges=direction>0?[[0,40],[340,380],[380,420],[420,460],[460,500]]:[[0,40],[40,80],[80,120],[120,160],[460,500]];
+ const p=planPocket(500,ranges,60,direction>0?275:165,direction);
+ assert.ok(p, 'edge-anchored group borrows space from adjacent runway');
+ assert.ok(p.shifts.some(n=>Math.abs(n)>1));
+ p.ranges.forEach(([a,b],i)=>{assert.ok(a>=0&&b<=500);if(i)assert.ok(a>=p.ranges[i-1][1]);});
+});
+
+for (const d of [-1,1]) test(`single grouped control can make room at screen edge ${d}`,()=>{
+ const ranges=d>0?[[400,500]]:[[0,100]];
+ const p=planPocket(500,ranges,60,d>0?335:105,d);
+ assert.ok(p);assert.equal(p.target,d>0?440:0);
+ assert.ok(p.ranges[0][0]>=0&&p.ranges[0][1]<=500);
+});

@@ -55,3 +55,13 @@ test('random walks and changing panels never paint onto obstacles when fully vis
         assert.ok(Number.isFinite(p.x));
     }
 });
+
+test('hide and seek chooses distant positions across random samples',()=>{
+ const targets=new Set();
+ for(let i=0;i<100;i++) {
+  const p=new PetEngine(()=>i/100);p.layout(1200,[[500,600]],60);p.x=200;p.hide();
+  assert.ok(Math.abs(p.target-200)>=120);
+  assert.ok(p.spans.some(([a,b])=>p.target>=a&&p.target<=b));targets.add(p.target);
+ }
+ assert.ok(targets.size>90);
+});
