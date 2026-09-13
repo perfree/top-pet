@@ -1,0 +1,9 @@
+{
+  "uuid": "shell-test@local",
+  "name": "Isolated Panel Pet Integration Tests",
+  "shell-version": [
+    "46"
+  ],
+  "version": 1,
+  "description": "Integration test harness; never install in your desktop session."
+}

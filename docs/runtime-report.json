@@ -1,0 +1,151 @@
+{
+  "passed": true,
+  "error": null,
+  "tests": [
+    {
+      "name": "extension ACTIVE",
+      "passed": true,
+      "state": 1
+    },
+    {
+      "name": "pet follows real panel scale without 32px cap",
+      "passed": true,
+      "width": 76,
+      "height": 64
+    },
+    {
+      "name": "all eight transparent textures loaded",
+      "passed": true
+    },
+    {
+      "name": "pet mapped onto real panel",
+      "passed": true,
+      "panel": {
+        "x": 0,
+        "y": 0,
+        "width": 2560,
+        "height": 64
+      },
+      "spans": [
+        [
+          135,
+          1071
+        ],
+        [
+          1414,
+          2175
+        ]
+      ]
+    },
+    {
+      "name": "real panel controls divide walkable spaces",
+      "passed": true,
+      "spans": [
+        [
+          135,
+          1013
+        ],
+        [
+          1472,
+          2175
+        ]
+      ]
+    },
+    {
+      "name": "live timer moves pet",
+      "passed": true
+    },
+    {
+      "name": "left mouse click pets capybara",
+      "passed": true
+    },
+    {
+      "name": "right mouse click opens interaction menu",
+      "passed": true
+    },
+    {
+      "name": "physical menu click feeds carrot",
+      "passed": true
+    },
+    {
+      "name": "underlying panel icon still receives clicks",
+      "passed": true
+    },
+    {
+      "name": "portal target 1",
+      "passed": true
+    },
+    {
+      "name": "fully hidden before crossing 1",
+      "passed": true
+    },
+    {
+      "name": "crossed actual icon 1",
+      "passed": true
+    },
+    {
+      "name": "visible after emerging 1",
+      "passed": true
+    },
+    {
+      "name": "portal target -1",
+      "passed": true
+    },
+    {
+      "name": "fully hidden before crossing -1",
+      "passed": true
+    },
+    {
+      "name": "crossed actual icon -1",
+      "passed": true
+    },
+    {
+      "name": "visible after emerging -1",
+      "passed": true
+    },
+    {
+      "name": "hide and seek can be won with a real click",
+      "passed": true
+    },
+    {
+      "name": "pet hidden in overview",
+      "passed": true
+    },
+    {
+      "name": "pet returns after overview",
+      "passed": true
+    },
+    {
+      "name": "crowded icons animated aside",
+      "passed": true
+    },
+    {
+      "name": "actual panel actors moved",
+      "passed": true
+    },
+    {
+      "name": "new pocket fits enlarged pet",
+      "passed": true
+    },
+    {
+      "name": "pet safely exits the temporary pocket",
+      "passed": true
+    },
+    {
+      "name": "all icon positions restored",
+      "passed": true
+    },
+    {
+      "name": "disable removes timer, overlay and menu",
+      "passed": true
+    },
+    {
+      "name": "re-enable creates working fresh actors",
+      "passed": true
+    },
+    {
+      "name": "re-enable does not leak overlay actors",
+      "passed": true
+    }
+  ]
+}

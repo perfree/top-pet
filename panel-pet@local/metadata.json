@@ -1,0 +1,10 @@
+{
+  "uuid": "panel-pet@local",
+  "name": "Panel Pet · 顶栏小伙伴",
+  "description": "顶栏散步、奔跑、闪现、捉迷藏和喂食。软萌卡皮巴拉。",
+  "shell-version": [
+    "46"
+  ],
+  "version": 3,
+  "url": "https://github.com/perfree/top-pet"
+}

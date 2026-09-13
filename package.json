@@ -1,0 +1,12 @@
+{
+  "name": "top-pet",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node tests/engine.test.js && node tests/push.test.js",
+    "test:shell": "bash tools/shell-test.sh",
+    "build": "python3 tools/build.py"
+  },
+  "version": "0.1.0",
+  "description": "A cute capybara companion for the GNOME 46 top panel"
+}
